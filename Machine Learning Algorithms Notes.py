@@ -773,6 +773,32 @@ Image(filename = PATH + "XGB.png", width=800, height=500)
 
 # ### Tune Hypeparameter
 
+# In[ ]:
+
+
+#GridSearchCV
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_two_train,y_two_test=train_test_split(X,y_two,test_size = 0.25, random_state=42)
+
+from scipy.stats import randint
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV
+
+param_dist = {"max_depth": [3, 20],
+              "max_features": np.arange(1,20),
+              "min_samples_leaf": np.arange(1,20),
+              "criterion": ["gini", "entropy"]}
+tree = DecisionTreeClassifier()
+tree_cv = GridSearchCV(tree, param_dist, cv=5)
+tree_cv.fit(X_train,y_two_train) 
+y_pred=tree_cv.best_estimator_.predict(X_test)
+
+#tree_cv.score(X_test,y_two_test)
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_two_test,y_pred)
+
+
 # In[203]:
 
 
