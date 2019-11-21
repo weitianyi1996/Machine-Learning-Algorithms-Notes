@@ -87,10 +87,10 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import RandomizedSearchCV
 
 # Setup the parameters and distributions to sample from: param_dist
-param_dist = {"max_depth": [3, None],
-              "max_features": randint(1, 9),
-              "min_samples_leaf": randint(1, 9),
-              "criterion": ["gini", "entropy"]}
+param_dist = {"max_depth": np.linspace(1,50,50),
+             "max_features": np.arange(1,X_train.shape[1]),
+             "min_samples_leaf": np.linspace(0.1,0.5,20),
+             "criterion": ["gini", "entropy"]}
 
 # Instantiate a Decision Tree classifier: tree
 tree = DecisionTreeClassifier()
@@ -106,6 +106,20 @@ tree_cv.best_estimator_.predict(X_test)
 
 #get accuracy
 tree_cv.score(X_test,y_test)
+
+
+# In[ ]:
+
+
+#tree's feature importance
+import pandas as pd
+importances = tree_cv.best_estimator_.feature_importances_
+dic={X.columns[i]:v for i,v in enumerate(importances) if v!=0}
+df=pd.DataFrame.from_dict(list(dic.items()))
+df.columns=['Feature','Importance']
+df=df.sort_values(by='Importance',ascending=False)
+df=df.reset_index().iloc[:,1:]
+df
 
 
 # training data
