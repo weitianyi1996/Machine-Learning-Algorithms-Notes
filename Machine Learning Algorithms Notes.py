@@ -412,11 +412,13 @@ table.sort_values(by='P>|z|')
 # In[ ]:
 
 
-#precision/recall
+#precision/recall/f1 score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-print('precision score is: '+str(precision_score(y_test,y_pred)))
-print('recall score is: '+str(recall_score(y_test,y_pred)))
+from sklearn.metrics import f1_score
+print('precision score is: '+str(precision_score(y_two_test,y_pred)))
+print('recall score is: '+str(recall_score(y_two_test,y_pred)))
+print('f1 score is: '+str(f1_score(y_two_test,y_pred)))
 
 
 # In[ ]:
