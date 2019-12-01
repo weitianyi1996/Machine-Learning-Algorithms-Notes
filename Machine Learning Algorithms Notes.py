@@ -835,6 +835,18 @@ y_pred=best_model.predict(X_test)
 accuracy_score(y_test,y_pred)
 
 
+# ### Naive Bayes
+
+# inference:https://towardsdatascience.com/introduction-to-naive-bayes-classification-4cffabb1ae54
+
+# Bayes rules
+# P(A|B)=P(B|A)*P(A)/P(B)
+
+# P(Ci|x1,x2,x3...xn)=P(x1,x2,x3...x|Ci)*P(Ci)/P(x1,x2,x3...x)=P(x1,x2,x3...x|Ci)*P(Ci)
+# assumption: x1,x2,x3...xn conditionally independent distributed
+# P(Ci|x1,x2,x3...xn)=P(Ci)*(P(x1|Ci)*P(x2|Ci)*P(x3|Ci)...*P(xn|Ci))
+# #compare each i from 0 to n, get the max probablity, go with that i,ex: C3(class 3)
+
 # ### Deep Learning Notes
 
 # In[ ]:
