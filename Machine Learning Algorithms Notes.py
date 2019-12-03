@@ -403,6 +403,32 @@ table.sort_values(by='P>|z|')
 #odds=p/(1-p)=e**(bo+b1*x1+b2*x2+...+bn*xn)
 
 
+# ### Lasso Logistic Regression
+
+# In[ ]:
+
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_two_train,y_two_test=train_test_split(X,y_two,test_size = 0.35, random_state=42)
+
+from sklearn.linear_model import LogisticRegressionCV
+lasso_lr = LogisticRegressionCV(penalty="l1",cv=5,solver='liblinear',random_state=0)
+lasso_lr.fit(X_train,y_two_train)
+
+thetaLasso=lasso_lr.coef_
+
+#alpha after tuning
+lasso_lr.C_
+
+#translate the lasso lr result with columns name
+lassoCoef=thetaLasso.tolist()[0]
+lassoCoef_dic={X_train.columns[i]:v for i,v in enumerate(lassoCoef)}
+lassoCoef_DF=pd.DataFrame.from_dict(list(lassoCoef_dic.items()))
+lassoCoef_DF.columns=['Feature','Coef']
+lassoCoef_DF=lassoCoef_DF.loc[lassoCoef_DF['Coef']!=0,:]#remain coef is not 0
+lassoCoef_DF
+
+
 # ### Model Performance 
 
 # In[39]:
