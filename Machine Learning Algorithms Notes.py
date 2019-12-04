@@ -429,6 +429,101 @@ lassoCoef_DF=lassoCoef_DF.loc[lassoCoef_DF['Coef']!=0,:]#remain coef is not 0
 lassoCoef_DF
 
 
+# ### PCA+Lasso Logistic Regression(Pipeline)
+
+# In[ ]:
+
+
+#GridSearchCV
+#PCA:                     from 1 to 313(all features)
+#Logistic Regression:     from 10**-5,1(penlty term)
+#GridSearchCV:generate PCA and then do Logistic Regression under that hyperparameter condition
+
+
+# In[ ]:
+
+
+X=data.iloc[:,2:]
+y_two,y_three=data['mkt_ret_regimes'],data['three_factor_regimes']
+X=X.iloc[0:-3,2:]
+X=X.reset_index().iloc[:,1:]
+y_two=y_two[3:]
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_two_train,y_two_test=train_test_split(X,y_two,test_size = 0.5, random_state=42)
+
+
+# In[ ]:
+
+
+from sklearn.preprocessing import StandardScaler
+# Standardizing the features
+X_train_Scale = StandardScaler().fit_transform(X_train)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import linear_model, decomposition
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+logistic = linear_model.LogisticRegression()
+pca = decomposition.PCA()
+pipe = Pipeline(steps=[('pca', pca), ('logistic', logistic)])
+
+
+n_components = np.arange(10,300,10).tolist()
+Cs = np.logspace(-5, 1, 1000)
+#Parameters of pipelines can be set using ‘__’ separated parameter names:
+estimator = GridSearchCV(pipe,dict(pca__n_components=n_components,logistic__C=Cs),cv=5)
+estimator.fit(X_train_Scale,y_two_train)
+
+plt.axvline(estimator.best_estimator_.named_steps['pca'].n_components,linestyle=':', label='n_components chosen')
+plt.legend(prop=dict(size=12))
+plt.show()
+
+
+# In[ ]:
+
+
+#prediction
+X_test_Scale = StandardScaler().fit_transform(X_test)
+y_pred=estimator.predict(X_test_Scale)
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_two_test,y_pred)
+
+
+# In[ ]:
+
+
+#auroc
+import numpy as np
+from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
+from matplotlib import pyplot
+
+ns_probs = [1 if np.average(y_two_test)>=0.5 else 0 for _ in range(len(y_two_test))]#common class
+
+ns_auc = roc_auc_score(y_two_test,ns_probs)
+lr_auc = roc_auc_score(y_two_test,y_pred)
+# summarize scores
+print('No Skill: ROC AUC=%.3f' % (ns_auc))
+print('Logistic: ROC AUC=%.3f' % (lr_auc))
+# calculate roc curves
+ns_fpr, ns_tpr, _ = roc_curve(y_two_test,ns_probs)
+lr_fpr, lr_tpr, _ = roc_curve(y_two_test,y_pred)
+# plot the roc curve for the model
+pyplot.plot(ns_fpr, ns_tpr, linestyle='--', label='No Skill')
+pyplot.plot(lr_fpr, lr_tpr, marker='.', label='LR PCA')
+# axis labels
+pyplot.xlabel('False Positive Rate')
+pyplot.ylabel('True Positive Rate')
+# show the legend
+pyplot.legend()
+# show the plot
+pyplot.show()
+
+
 # ### Model Performance 
 
 # In[39]:
